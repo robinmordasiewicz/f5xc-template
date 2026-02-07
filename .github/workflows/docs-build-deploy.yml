@@ -29,6 +29,9 @@ jobs:
           repository: robinmordasiewicz/f5xc-docs-theme
           path: builder/theme
 
+      - name: Copy Astro config from theme
+        run: cp builder/theme/astro.config.mjs builder/astro.config.mjs
+
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
