@@ -47,6 +47,7 @@
   ],
   "topics": [],
   "pages": {
-    "enabled": true
+    "enabled": true,
+    "build_type": "workflow"
   }
 }
