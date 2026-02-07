@@ -20,4 +20,4 @@ docs/
     02-your-next-page.mdx
 ```
 
-All framework code, theme, and build tooling is managed centrally by the [docs-builder](https://github.com/robinmordasiewicz/docs-builder) repo. You only maintain content.
+All framework code, theme, and build tooling is managed centrally by the [f5xc-docs-builder](https://github.com/robinmordasiewicz/f5xc-docs-builder) repo. You only maintain content.
