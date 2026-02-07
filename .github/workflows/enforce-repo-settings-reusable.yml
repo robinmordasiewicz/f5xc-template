@@ -352,16 +352,11 @@ jobs:
 
                   # Create issue
                   DRIFT_LIST=$(printf '%b' "$DRIFT_FILES" | sed '/^$/d' | sed 's/^/- /')
+                  ISSUE_BODY=$(printf 'The following managed files have drifted from the canonical source in `%s`:\n\n%s\n\nThis issue was created automatically by the governance enforcement workflow.' \
+                    "$SOURCE_REPO" "$DRIFT_LIST")
                   ISSUE_NUM=$(gh issue create --repo "${OWNER}/${REPO}" \
                     --title "chore: sync managed files from governance template" \
-                    --body "$(cat <<ISSUE_EOF
-The following managed files have drifted from the canonical source in \`${SOURCE_REPO}\`:
-
-${DRIFT_LIST}
-
-This issue was created automatically by the governance enforcement workflow.
-ISSUE_EOF
-                    )" | grep -o '[0-9]*$')
+                    --body "$ISSUE_BODY" | grep -o '[0-9]*$')
                   echo "[OK] Created issue #${ISSUE_NUM}"
 
                   # Create branch from main HEAD
@@ -399,14 +394,8 @@ ISSUE_EOF
                   done
 
                   # Create PR
-                  PR_BODY=$(cat <<PR_EOF
-Closes #${ISSUE_NUM}
-
-Synced managed files from \`${SOURCE_REPO}\` canonical source:
-
-${DRIFT_LIST}
-PR_EOF
-                  )
+                  PR_BODY=$(printf 'Closes #%s\n\nSynced managed files from `%s` canonical source:\n\n%s' \
+                    "$ISSUE_NUM" "$SOURCE_REPO" "$DRIFT_LIST")
                   PR_URL=$(gh pr create --repo "${OWNER}/${REPO}" \
                     --head governance/sync-managed-files \
                     --title "chore: sync managed files from governance template" \
