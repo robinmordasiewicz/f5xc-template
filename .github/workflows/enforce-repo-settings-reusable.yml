@@ -158,10 +158,17 @@ jobs:
               fi
 
               desired_checks=$(echo "$DESIRED_PAYLOAD" | jq -c '.required_status_checks')
+              current_checks=$(echo "$CURRENT_PROTECTION" | jq -c '.required_status_checks')
               if [ "$desired_checks" = "null" ]; then
-                current_checks=$(echo "$CURRENT_PROTECTION" | jq -c '.required_status_checks')
                 if [ "$current_checks" != "null" ]; then
-                  echo "[WARN] Drift in required_status_checks"
+                  echo "[WARN] Drift in required_status_checks: should be disabled"
+                  PROTECTION_DRIFT=true
+                fi
+              else
+                desired_contexts=$(echo "$desired_checks" | jq -c '[.contexts[]?] // []' 2>/dev/null || echo '[]')
+                current_contexts=$(echo "$current_checks" | jq -c '[.contexts[]?] // []' 2>/dev/null || echo '[]')
+                if [ "$desired_contexts" != "$current_contexts" ]; then
+                  echo "[WARN] Drift in required_status_checks.contexts: current=$current_contexts desired=$desired_contexts"
                   PROTECTION_DRIFT=true
                 fi
               fi
