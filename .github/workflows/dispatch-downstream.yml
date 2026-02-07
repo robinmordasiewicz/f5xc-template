@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - '.github/config/default-repo-settings.json'
+      - '.github/canonical/**'
+      - '.github/workflows/enforce-repo-settings-reusable.yml'
+      - '.github/workflows/docs-build-deploy.yml'
 
 permissions:
   contents: read
@@ -14,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Dispatch to downstream repos
         env:
