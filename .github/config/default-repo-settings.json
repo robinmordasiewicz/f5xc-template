@@ -48,5 +48,6 @@
   "topics": [],
   "pages": {
     "enabled": true
-  }
+  },
+  "_test_cascade": true
 }
