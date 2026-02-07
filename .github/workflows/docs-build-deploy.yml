@@ -1,0 +1,82 @@
+name: Build and Deploy Docs
+on:
+  workflow_call:
+    inputs:
+      content-path:
+        description: 'Path to content directory in the calling repo'
+        required: false
+        default: 'docs'
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout content repo
+        uses: actions/checkout@v5
+        with:
+          path: content
+
+      - name: Checkout builder
+        uses: actions/checkout@v5
+        with:
+          repository: robinmordasiewicz/f5xc-docs-builder
+          path: builder
+
+      - name: Checkout theme
+        uses: actions/checkout@v5
+        with:
+          repository: robinmordasiewicz/f5xc-docs-theme
+          path: builder/theme
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: builder/package-lock.json
+
+      - name: Install dependencies
+        working-directory: builder
+        run: npm ci
+
+      - name: Inject content
+        run: |
+          rm -rf builder/src/content/docs/*
+          cp -r content/${{ inputs.content-path }}/* builder/src/content/docs/
+
+      - name: Extract metadata
+        id: meta
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          TITLE=$(grep -m1 '^title:' builder/src/content/docs/index.mdx | sed 's/title: *["]*//;s/["]*$//' || echo "$REPO_NAME")
+          echo "title=$TITLE" >> "$GITHUB_OUTPUT"
+          echo "base=/$REPO_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        working-directory: builder
+        env:
+          DOCS_TITLE: ${{ steps.meta.outputs.title }}
+          DOCS_BASE: ${{ steps.meta.outputs.base }}
+          DOCS_SITE: https://robinmordasiewicz.github.io
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: builder/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

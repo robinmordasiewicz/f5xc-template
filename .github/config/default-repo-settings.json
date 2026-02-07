@@ -49,5 +49,24 @@
   "pages": {
     "enabled": true,
     "build_type": "workflow"
+  },
+  "managed_files": {
+    "source_repo": "robinmordasiewicz/f5xc-template",
+    "source_base": ".github/canonical",
+    "files": [
+      ".github/workflows/deploy.yml",
+      ".github/workflows/enforce-repo-settings.yml",
+      ".github/workflows/require-linked-issue.yml",
+      ".github/PULL_REQUEST_TEMPLATE.md",
+      ".github/ISSUE_TEMPLATE/bug_report.md",
+      ".github/ISSUE_TEMPLATE/feature_request.md",
+      ".github/ISSUE_TEMPLATE/documentation.md",
+      ".github/ISSUE_TEMPLATE/config.yml",
+      "CONTRIBUTING.md",
+      "CLAUDE.md",
+      ".editorconfig",
+      ".gitignore",
+      "LICENSE"
+    ]
   }
 }
