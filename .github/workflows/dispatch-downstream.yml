@@ -6,7 +6,7 @@ on:
     paths:
       - '.github/config/default-repo-settings.json'
       - '.github/canonical/**'
-      - '.github/workflows/enforce-repo-settings-reusable.yml'
+      - '.github/workflows/enforce-repo-settings.yml'
       - '.github/workflows/docs-build-deploy.yml'
 
 permissions:
