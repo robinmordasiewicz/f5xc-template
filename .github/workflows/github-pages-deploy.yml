@@ -21,6 +21,27 @@ on:
         required: false
         default: 'https://robinmordasiewicz.github.io'
         type: string
+  workflow_dispatch:
+    inputs:
+      content-path:
+        description: 'Path to content directory'
+        required: false
+        default: 'docs'
+        type: string
+      builder-image:
+        description: 'Builder Docker image URI'
+        required: false
+        default: 'ghcr.io/robinmordasiewicz/f5xc-docs-builder:latest'
+        type: string
+      docs-title:
+        description: 'Documentation site title'
+        required: false
+        type: string
+      docs-site:
+        description: 'Documentation site URL'
+        required: false
+        default: 'https://robinmordasiewicz.github.io'
+        type: string
 
 jobs:
   build:
