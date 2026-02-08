@@ -17,47 +17,35 @@ jobs:
         with:
           path: content
 
-      - name: Checkout builder
-        uses: actions/checkout@v5
-        with:
-          repository: robinmordasiewicz/f5xc-docs-builder
-          path: builder
-
-      - name: Checkout theme
-        uses: actions/checkout@v5
-        with:
-          repository: robinmordasiewicz/f5xc-docs-theme
-          path: builder/theme
-
-      - name: Copy Astro config from theme
-        run: cp builder/theme/astro.config.mjs builder/astro.config.mjs
-
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: builder/package-lock.json
+          cache-dependency-path: content/package-lock.json
 
       - name: Install dependencies
-        working-directory: builder
+        working-directory: content
         run: npm ci
+
+      - name: Copy Astro config from theme
+        run: cp content/node_modules/f5xc-docs-theme/astro.config.mjs content/astro.config.mjs
 
       - name: Inject content
         run: |
-          rm -rf builder/src/content/docs/*
-          cp -r content/${{ inputs.content-path }}/* builder/src/content/docs/
+          rm -rf content/src/content/docs/*
+          cp -r content/${{ inputs.content-path }}/* content/src/content/docs/
 
       - name: Extract metadata
         id: meta
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
-          TITLE=$(grep -m1 '^title:' builder/src/content/docs/index.mdx | sed 's/title: *["]*//;s/["]*$//' || echo "$REPO_NAME")
+          TITLE=$(grep -m1 '^title:' content/src/content/docs/index.mdx | sed 's/title: *["]*//;s/["]*$//' || echo "$REPO_NAME")
           echo "title=$TITLE" >> "$GITHUB_OUTPUT"
           echo "base=/$REPO_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Build
-        working-directory: builder
+        working-directory: content
         env:
           DOCS_TITLE: ${{ steps.meta.outputs.title }}
           DOCS_BASE: ${{ steps.meta.outputs.base }}
@@ -68,7 +56,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: builder/dist
+          path: content/dist
 
   deploy:
     needs: build
