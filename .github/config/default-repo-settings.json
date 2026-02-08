@@ -61,6 +61,7 @@
       {"src": ".github/ISSUE_TEMPLATE/feature_request.md", "dest": ".github/ISSUE_TEMPLATE/feature_request.md"},
       {"src": ".github/ISSUE_TEMPLATE/documentation.md", "dest": ".github/ISSUE_TEMPLATE/documentation.md"},
       {"src": ".github/ISSUE_TEMPLATE/config.yml", "dest": ".github/ISSUE_TEMPLATE/config.yml"},
+      {"src": "workflows/auto-merge.yml", "dest": ".github/workflows/auto-merge.yml"},
       {"src": "CONTRIBUTING.md", "dest": "CONTRIBUTING.md"},
       {"src": "CLAUDE.md", "dest": "CLAUDE.md"},
       {"src": ".editorconfig", "dest": ".editorconfig"},
