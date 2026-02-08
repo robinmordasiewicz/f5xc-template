@@ -5,9 +5,17 @@ on:
     branches: [main]
     paths:
       - '.github/config/default-repo-settings.json'
-      - '.github/canonical/**'
+      - 'workflows/**'
       - '.github/workflows/enforce-repo-settings.yml'
       - '.github/workflows/docs-build-deploy.yml'
+      - '.github/workflows/require-linked-issue.yml'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - 'CONTRIBUTING.md'
+      - 'CLAUDE.md'
+      - '.editorconfig'
+      - '.gitignore'
+      - 'LICENSE'
 
 permissions:
   contents: read
