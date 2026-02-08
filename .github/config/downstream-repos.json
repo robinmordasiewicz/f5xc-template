@@ -2,5 +2,10 @@
   "robinmordasiewicz/f5xc-ddos-administration-guide",
   "robinmordasiewicz/f5xc-docs-builder",
   "robinmordasiewicz/f5xc-docs-theme",
-  "robinmordasiewicz/f5xc-api-fixed"
+  "robinmordasiewicz/f5xc-api-fixed",
+  "robinmordasiewicz/vscode-f5xc-tools",
+  "robinmordasiewicz/f5xc-cloudstatus-mcp",
+  "robinmordasiewicz/f5xc-auth",
+  "robinmordasiewicz/f5xc-marketplace",
+  "robinmordasiewicz/f5xc-api-mcp"
 ]
