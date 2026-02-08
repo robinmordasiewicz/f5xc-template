@@ -296,8 +296,6 @@ jobs:
             echo "[SKIP] No managed_files in config"
           else
             SOURCE_REPO=$(echo "$MANAGED_FILES" | jq -r '.source_repo')
-            SOURCE_BASE=$(echo "$MANAGED_FILES" | jq -r '.source_base')
-            FILE_LIST=$(echo "$MANAGED_FILES" | jq -r '.files[]')
 
             # Guard: skip if running in the source repo itself
             if [ "${OWNER}/${REPO}" = "$SOURCE_REPO" ]; then
@@ -306,31 +304,34 @@ jobs:
               DRIFT_FILES=""
               DRIFT_COUNT=0
 
-              for file in $FILE_LIST; do
-                # Fetch canonical content
-                CANONICAL_RESPONSE=$(gh api "repos/${SOURCE_REPO}/contents/${SOURCE_BASE}/${file}" 2>/dev/null) || true
+              for file_obj in $(echo "$MANAGED_FILES" | jq -c '.files[]'); do
+                src=$(echo "$file_obj" | jq -r '.src')
+                dest=$(echo "$file_obj" | jq -r '.dest')
+
+                # Fetch canonical content from source path
+                CANONICAL_RESPONSE=$(gh api "repos/${SOURCE_REPO}/contents/${src}" 2>/dev/null) || true
                 if [ -z "$CANONICAL_RESPONSE" ]; then
-                  echo "[WARN] Could not fetch canonical: ${SOURCE_BASE}/${file}"
+                  echo "[WARN] Could not fetch canonical: ${src}"
                   continue
                 fi
                 CANONICAL_CONTENT=$(echo "$CANONICAL_RESPONSE" | jq -r '.content' | tr -d '\n' | base64 -d 2>/dev/null) || true
 
-                # Fetch downstream content (handle 404)
-                DOWNSTREAM_RESPONSE=$(gh api "repos/${OWNER}/${REPO}/contents/${file}" 2>/dev/null) || true
+                # Fetch downstream content at dest path (handle 404)
+                DOWNSTREAM_RESPONSE=$(gh api "repos/${OWNER}/${REPO}/contents/${dest}" 2>/dev/null) || true
                 if [ -z "$DOWNSTREAM_RESPONSE" ]; then
-                  echo "[DRIFT] Missing downstream: ${file}"
-                  DRIFT_FILES="${DRIFT_FILES}${file}\n"
+                  echo "[DRIFT] Missing downstream: ${dest}"
+                  DRIFT_FILES="${DRIFT_FILES}${dest}\n"
                   DRIFT_COUNT=$((DRIFT_COUNT + 1))
                   continue
                 fi
                 DOWNSTREAM_CONTENT=$(echo "$DOWNSTREAM_RESPONSE" | jq -r '.content' | tr -d '\n' | base64 -d 2>/dev/null) || true
 
                 if [ "$CANONICAL_CONTENT" != "$DOWNSTREAM_CONTENT" ]; then
-                  echo "[DRIFT] Content mismatch: ${file}"
-                  DRIFT_FILES="${DRIFT_FILES}${file}\n"
+                  echo "[DRIFT] Content mismatch: ${dest}"
+                  DRIFT_FILES="${DRIFT_FILES}${dest}\n"
                   DRIFT_COUNT=$((DRIFT_COUNT + 1))
                 else
-                  echo "[OK] ${file}"
+                  echo "[OK] ${dest}"
                 fi
               done
 
@@ -367,30 +368,33 @@ jobs:
                   echo "[OK] Created branch governance/sync-managed-files"
 
                   # Commit each drifted file to the branch
-                  for file in $(printf '%b' "$DRIFT_FILES" | sed '/^$/d'); do
+                  for dest_file in $(printf '%b' "$DRIFT_FILES" | sed '/^$/d'); do
+                    # Look up the source path from the manifest
+                    src_file=$(echo "$MANAGED_FILES" | jq -r --arg d "$dest_file" '.files[] | select(.dest == $d) | .src')
+
                     # Get canonical content as base64
-                    B64=$(gh api "repos/${SOURCE_REPO}/contents/${SOURCE_BASE}/${file}" --jq '.content' | tr -d '\n')
+                    B64=$(gh api "repos/${SOURCE_REPO}/contents/${src_file}" --jq '.content' | tr -d '\n')
 
                     # Check if file exists downstream (need SHA for update)
-                    FILE_SHA=$(gh api "repos/${OWNER}/${REPO}/contents/${file}" --jq '.sha' 2>/dev/null) || true
+                    FILE_SHA=$(gh api "repos/${OWNER}/${REPO}/contents/${dest_file}" --jq '.sha' 2>/dev/null) || true
 
                     if [ -n "$FILE_SHA" ]; then
                       # Update existing file
-                      jq -n --arg msg "chore: sync ${file}" \
+                      jq -n --arg msg "chore: sync ${dest_file}" \
                             --arg content "$B64" \
                             --arg sha "$FILE_SHA" \
                             --arg branch "governance/sync-managed-files" \
                         '{"message":$msg,"content":$content,"sha":$sha,"branch":$branch}' | \
-                        gh api "repos/${OWNER}/${REPO}/contents/${file}" --method PUT --input - >/dev/null
+                        gh api "repos/${OWNER}/${REPO}/contents/${dest_file}" --method PUT --input - >/dev/null
                     else
                       # Create new file
-                      jq -n --arg msg "chore: sync ${file}" \
+                      jq -n --arg msg "chore: sync ${dest_file}" \
                             --arg content "$B64" \
                             --arg branch "governance/sync-managed-files" \
                         '{"message":$msg,"content":$content,"branch":$branch}' | \
-                        gh api "repos/${OWNER}/${REPO}/contents/${file}" --method PUT --input - >/dev/null
+                        gh api "repos/${OWNER}/${REPO}/contents/${dest_file}" --method PUT --input - >/dev/null
                     fi
-                    echo "[OK] Synced ${file}"
+                    echo "[OK] Synced ${dest_file}"
                   done
 
                   # Create PR
