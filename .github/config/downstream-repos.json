@@ -1,5 +1,6 @@
 [
   "robinmordasiewicz/f5xc-ddos-administration-guide",
   "robinmordasiewicz/f5xc-docs-builder",
-  "robinmordasiewicz/f5xc-docs-theme"
+  "robinmordasiewicz/f5xc-docs-theme",
+  "robinmordasiewicz/f5xc-api-fixed"
 ]
