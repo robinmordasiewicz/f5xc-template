@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/config/default-repo-settings.json'
+      - '.github/config/downstream-repos.json'
       - 'workflows/**'
       - '.github/workflows/enforce-repo-settings.yml'
       - '.github/workflows/docs-build-deploy.yml'
