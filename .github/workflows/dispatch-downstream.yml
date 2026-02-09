@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/config/default-repo-settings.json'
       - '.github/config/downstream-repos.json'
+      - '.github/config/docs-sites.json'
       - 'workflows/**'
       - '.github/workflows/auto-merge.yml'
       - '.github/workflows/enforce-repo-settings.yml'
