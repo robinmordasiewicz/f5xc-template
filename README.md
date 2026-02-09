@@ -1,4 +1,4 @@
-# Documentation Template
+# Repository Template
 
 Click **"Use this template"** to create a new documentation site.
 
@@ -18,5 +18,3 @@ docs/
   01-getting-started.mdx
   02-your-next-page.mdx
 ```
-
-All framework code, theme, and build tooling is managed centrally by the [f5xc-docs-builder](https://github.com/robinmordasiewicz/f5xc-docs-builder) repo. You only maintain content.
