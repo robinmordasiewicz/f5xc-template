@@ -7,5 +7,6 @@
   "robinmordasiewicz/f5xc-cloudstatus-mcp",
   "robinmordasiewicz/f5xc-auth",
   "robinmordasiewicz/f5xc-marketplace",
-  "robinmordasiewicz/f5xc-api-mcp"
+  "robinmordasiewicz/f5xc-api-mcp",
+  "robinmordasiewicz/f5xc-xcsh"
 ]
