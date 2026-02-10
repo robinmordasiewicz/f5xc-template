@@ -1,11 +1,25 @@
 ---
 title: Getting Started
+sidebar:
+  order: 1
 ---
 
-Welcome to your new documentation site. Edit this file and add more `.mdx` files under the `docs/` directory to build out your content.
+This repository is the governance template for F5 Distributed Cloud (f5xc) downstream repos. It defines the canonical versions of workflows, configuration files, issue templates, and editor settings that are automatically synced to all enrolled repositories.
+
+## Key Directories
+
+| Directory / File | Purpose |
+|---|---|
+| `.github/config/` | Default repo settings, downstream repo registry, per-repo override template |
+| `.github/workflows/` | Reusable workflows (enforcement, auto-merge, pages deploy, linked-issue check) |
+| `workflows/` | Caller workflow templates that downstream repos install into `.github/workflows/` |
+| `docs/` | Documentation source (built and deployed via Astro Starlight) |
+| `CONTRIBUTING.md` | Contributor workflow rules synced to all downstream repos |
+| `CLAUDE.md` | AI assistant instructions synced to all downstream repos |
+| `MIGRATION.md` | Step-by-step runbook for onboarding a new downstream repo |
 
 ## Next Steps
 
-1. Edit `docs/index.mdx` to set your site title and description
-2. Add guide pages as numbered `.mdx` files (e.g., `02-installation.mdx`)
-3. Push to `main` to trigger an automatic build and deploy
+- Read the [Governance Reference](../02-governance-reference/) for a detailed explanation of the enforcement system
+- See `MIGRATION.md` in the repository root for the full onboarding procedure
+- See `CONTRIBUTING.md` for the branch, commit, and PR workflow
