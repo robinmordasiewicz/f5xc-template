@@ -347,10 +347,6 @@ jobs:
                 if [ -n "$EXISTING_PR" ]; then
                   echo "[SKIP] Open sync PR #${EXISTING_PR} already exists"
                 else
-                  # Delete stale branch if it exists
-                  gh api "repos/${OWNER}/${REPO}/git/refs/heads/governance/sync-managed-files" \
-                    --method DELETE 2>/dev/null || true
-
                   # Create issue
                   DRIFT_LIST=$(printf '%b' "$DRIFT_FILES" | sed '/^$/d' | sed 's/^/- /')
                   ISSUE_BODY=$(printf 'The following managed files have drifted from the canonical source in `%s`:\n\n%s\n\nThis issue was created automatically by the governance enforcement workflow.' \
@@ -360,12 +356,15 @@ jobs:
                     --body "$ISSUE_BODY" | grep -o '[0-9]*$')
                   echo "[OK] Created issue #${ISSUE_NUM}"
 
-                  # Create branch from main HEAD
+                  # Create branch from main HEAD (try create, fall back to update if concurrent run created it)
                   MAIN_SHA=$(gh api "repos/${OWNER}/${REPO}/git/ref/heads/main" --jq '.object.sha')
-                  gh api "repos/${OWNER}/${REPO}/git/refs" --method POST \
+                  if ! gh api "repos/${OWNER}/${REPO}/git/refs" --method POST \
                     --input <(jq -n --arg sha "$MAIN_SHA" \
-                      '{"ref":"refs/heads/governance/sync-managed-files","sha":$sha}') >/dev/null
-                  echo "[OK] Created branch governance/sync-managed-files"
+                      '{"ref":"refs/heads/governance/sync-managed-files","sha":$sha}') >/dev/null 2>&1; then
+                    gh api "repos/${OWNER}/${REPO}/git/refs/heads/governance/sync-managed-files" \
+                      --method PATCH --input <(jq -n --arg sha "$MAIN_SHA" '{"sha":$sha,"force":true}') >/dev/null
+                  fi
+                  echo "[OK] Created or updated branch governance/sync-managed-files"
 
                   # Commit each drifted file to the branch
                   for dest_file in $(printf '%b' "$DRIFT_FILES" | sed '/^$/d'); do
