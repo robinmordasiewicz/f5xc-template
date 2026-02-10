@@ -36,7 +36,25 @@ Copy these from the template's `workflows/` directory into the downstream repo's
 | `github-pages-deploy.yml` | `workflows/github-pages-deploy.yml` | Builds and deploys docs via Astro |
 | `require-linked-issue.yml` | `.github/workflows/require-linked-issue.yml` | Blocks PRs without linked issues |
 
-### 3. Add Governance Files
+### 3. Consolidate .gitignore
+
+Before onboarding, merge the downstream repo's `.gitignore` entries into the template. The enforcement workflow **overwrites** the downstream `.gitignore` entirely, so any entries not in the template will be lost.
+
+```bash
+# Fetch the downstream .gitignore
+gh api repos/robinmordasiewicz/REPO_NAME/contents/.gitignore \
+  --jq '.content' | base64 -d > /tmp/downstream-gitignore
+
+# Compare with the template
+diff /tmp/downstream-gitignore .gitignore
+
+# Add any missing entries to the template .gitignore, organized by category
+# Commit the template change before proceeding with onboarding
+```
+
+Extra ignore patterns in repos that don't have those file types are harmless — they simply have no effect.
+
+### 4. Add Governance Files
 
 Copy from the template root:
 
@@ -51,7 +69,7 @@ Copy from the template root:
 - `.github/ISSUE_TEMPLATE/config.yml`
 - `.github/CODEOWNERS` (set `* @robinmordasiewicz`)
 
-### 4. Convert Docs to Starlight MDX
+### 5. Convert Docs to Starlight MDX
 
 Replace any existing `docs/` content with Starlight-compatible `.mdx` files.
 
@@ -85,7 +103,7 @@ description: Page description
 Content here in standard Markdown.
 ```
 
-### 5. Delete Legacy Files
+### 6. Delete Legacy Files
 
 Remove any previous docs tooling:
 
@@ -96,11 +114,11 @@ Remove any previous docs tooling:
 - `docs/javascripts/`
 - Any MkDocs-specific Markdown (`.md` files with MkDocs admonitions)
 
-### 6. Add to Downstream Registry
+### 7. Add to Downstream Registry
 
 In f5xc-template, add the repo to `.github/config/downstream-repos.json`.
 
-### 7. Verify
+### 8. Verify
 
 ```bash
 # Trigger enforcement
@@ -113,11 +131,11 @@ gh api repos/robinmordasiewicz/REPO_NAME/pages
 open https://robinmordasiewicz.github.io/REPO_NAME/
 ```
 
-### 8. Clean Up Branches
+### 9. Clean Up Branches
 
-After migration is verified and working, clean up legacy and stale remote branches. This step prevents clutter and confusion in the branch list.
+After migration is verified and working, clean up legacy and stale remote branches. This prevents clutter and confusion in the branch list.
 
-#### 8.1 List and Identify Stale Branches
+#### 9.1 List and Identify Stale Branches
 
 ```bash
 # List all remote branches sorted by last commit date
@@ -137,7 +155,7 @@ for branch in $(gh api repos/robinmordasiewicz/REPO_NAME/branches --paginate --j
 done
 ```
 
-#### 8.2 Delete Remote Branches
+#### 9.2 Delete Remote Branches
 
 ```bash
 # Delete the legacy gh-pages branch (safe after Pages config is updated)
@@ -152,7 +170,7 @@ for branch in old-feature-1 old-feature-2 old-docs-build; do
 done
 ```
 
-#### 8.3 Prune Local Tracking References
+#### 9.3 Prune Local Tracking References
 
 After deleting remote branches, clean up local references:
 
@@ -164,7 +182,7 @@ git fetch --prune
 git branch -r
 ```
 
-#### 8.4 Identify and Delete Merged Feature Branches
+#### 9.4 Identify and Delete Merged Feature Branches
 
 Feature branches that were merged to main can safely be deleted:
 
@@ -180,7 +198,7 @@ git branch -r --merged main | grep -v main | sed 's/origin\///' | \
   xargs -r -I {} gh api repos/robinmordasiewicz/REPO_NAME/git/refs/heads/{} --method DELETE
 ```
 
-#### 8.5 Clean Dependabot and Automation Branches
+#### 9.5 Clean Dependabot and Automation Branches
 
 If Dependabot or other automation created branches that are no longer needed:
 
@@ -332,7 +350,7 @@ gh api repos/OWNER/REPO/branches --paginate \
 
 | Pattern | Reason | Safe to Delete? | Action |
 |---------|--------|-----------------|--------|
-| `gh-pages` | Old Pages deployment branch | ✓ Yes (after verifying workflow-based Pages) | Delete immediately after Step 7 verification |
+| `gh-pages` | Old Pages deployment branch | ✓ Yes (after verifying workflow-based Pages) | Delete immediately after Step 8 verification |
 | `dependabot/*` (old) | Closed dependency update PR | ✓ Yes (if PR is merged/closed) | Use bulk delete for old dependabot branches |
 | `feature/*` (merged) | Feature branches merged to main | ✓ Yes | Use `git branch --merged main \| xargs git branch -d` |
 | `release/*` (old) | Release branches from previous versions | ✓ Yes | Delete if release is complete and tagged |
