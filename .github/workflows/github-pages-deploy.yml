@@ -61,6 +61,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Detect static asset directories
+        id: assets
+        run: |
+          CONTENT="${{ inputs.content-path }}"
+          MOUNTS=""
+          for dir in "$CONTENT"/*/; do
+            [ ! -d "$dir" ] && continue
+            dirname=$(basename "$dir")
+            if ! find "$dir" -maxdepth 1 \( -name '*.md' -o -name '*.mdx' \) | grep -q .; then
+              MOUNTS="$MOUNTS -v ${{ github.workspace }}/$dir:/app/public/$dirname:ro"
+              echo "Static asset directory: $dirname"
+            fi
+          done
+          echo "mounts=$MOUNTS" >> "$GITHUB_OUTPUT"
+
       - name: Build docs with container
         run: |
           mkdir -p ${{ runner.temp }}/docs-output
@@ -68,6 +83,7 @@ jobs:
           docker run --rm \
             --name docs-builder \
             -v ${{ github.workspace }}/${{ inputs.content-path }}:/content/docs:ro \
+            ${{ steps.assets.outputs.mounts }} \
             -v ${{ runner.temp }}/docs-output:/output \
             -e CONTENT_DIR=/content/docs \
             -e OUTPUT_DIR=/output \
