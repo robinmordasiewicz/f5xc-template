@@ -109,7 +109,7 @@ jobs:
           find "$OUTPUT_DIR" -type f | head -20
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ${{ runner.temp }}/docs-output
           retention-days: 1
