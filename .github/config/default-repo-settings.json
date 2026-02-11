@@ -66,8 +66,7 @@
       {"src": "CLAUDE.md", "dest": "CLAUDE.md"},
       {"src": ".editorconfig", "dest": ".editorconfig"},
       {"src": ".gitignore", "dest": ".gitignore"},
-      {"src": "LICENSE", "dest": "LICENSE"},
-      {"src": ".github/dependabot.yml", "dest": ".github/dependabot.yml"}
+      {"src": "LICENSE", "dest": "LICENSE"}
     ]
   }
 }
