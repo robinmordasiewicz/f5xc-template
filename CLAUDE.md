@@ -30,6 +30,29 @@ Use the format `<prefix>/<issue-number>-short-description`:
 - Fill out the PR template completely
 - Follow conventional commit messages (`feat:`, `fix:`, `docs:`)
 
+## CI Monitoring and Problem Reporting
+
+When monitoring GitHub Actions workflows,
+**never ignore or dismiss failures** — even if they
+are pre-existing or unrelated to your current change.
+
+For every problem observed during CI monitoring:
+
+1. **Create a GitHub issue** in the affected repo
+   - Use a clear, descriptive title
+   - Include the workflow run URL or relevant logs
+   - Note it was discovered during CI monitoring
+     of a different change
+   - Apply the `bug` label
+2. **Continue with your primary task** — do not let
+   issue creation block your current work
+3. **Report to the user** — mention the issues you
+   created so they have visibility
+
+Never say "pre-existing issue, unrelated to our
+change" and move on. If you see a problem,
+document it.
+
 ## Reference
 
 Read `CONTRIBUTING.md` for full governance details.
