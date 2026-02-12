@@ -32,26 +32,27 @@ Use the format `<prefix>/<issue-number>-short-description`:
 
 ## CI Monitoring and Problem Reporting
 
-When monitoring GitHub Actions workflows,
-**never ignore or dismiss failures** — even if they
-are pre-existing or unrelated to your current change.
+When monitoring CI workflows, **never ignore
+failures** — even pre-existing or unrelated ones.
+You are authorized to create GitHub issues without
+asking for confirmation. This is a standing
+instruction, not a suggestion.
 
-For every problem observed during CI monitoring:
+For every problem observed:
 
-1. **Create a GitHub issue** in the affected repo
+1. **Immediately create a GitHub issue** — do not
+   ask whether to create it, just create it
    - Use a clear, descriptive title
    - Include the workflow run URL or relevant logs
    - Note it was discovered during CI monitoring
-     of a different change
    - Apply the `bug` label
-2. **Continue with your primary task** — do not let
-   issue creation block your current work
-3. **Report to the user** — mention the issues you
-   created so they have visibility
+2. **Continue with your primary task** — issue
+   creation must not block your current work
+3. **Report to the user** what issues you created
 
-Never say "pre-existing issue, unrelated to our
-change" and move on. If you see a problem,
-document it.
+Do not ask "Want me to create an issue?" — the
+answer is always yes. See a problem, file an issue,
+move on.
 
 ## Reference
 
