@@ -19,6 +19,7 @@ on:
       - '.editorconfig'
       - '.gitignore'
       - 'LICENSE'
+      - '.pre-commit-config.yaml'
 
 permissions:
   contents: read
